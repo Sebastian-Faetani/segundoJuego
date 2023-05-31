@@ -16,6 +16,7 @@ export default class Juego extends Phaser.Scene {
     console.log(data);
     this.nivel = 2;
     this.cantidadEstrellas = data.cantidadEstrellas || 0;
+    this.gameOver = false;
   }
 
   create() {
@@ -63,6 +64,10 @@ export default class Juego extends Phaser.Scene {
 
     // Create empty group of starts
     this.estrellas = this.physics.add.group();
+    this.bomb = this.physics.add.group({
+      immovable: true,
+      allowGravity: false
+    });
 
     // find object layer
     // if type is "stars", add to stars group
@@ -75,15 +80,17 @@ export default class Juego extends Phaser.Scene {
           // add star to scene
           // console.log("estrella agregada: ", x, y);
 
-          const star = (this.estrellas.create(
-            x,
-            y,
-            "star"
-          ).body.allowGravity = false);
+          const star = (this.estrellas.create(x, y, "star"));
+          break;
+        }
+        case "bomb": {
+          const bomb = this.bomb.create(x, y, "bomb").setBounce(1, 1);
           break;
         }
       }
     });
+
+    this.salida.visible = false;
 
     this.physics.add.collider(this.jugador, plataformaLayer);
     this.physics.add.collider(this.estrellas, plataformaLayer);
@@ -91,6 +98,14 @@ export default class Juego extends Phaser.Scene {
       this.jugador,
       this.estrellas,
       this.recolectarEstrella,
+      null,
+      this
+    );
+    this.physics.add.collider(this.bomb, plataformaLayer)
+    this.physics.add.collider(
+      this.jugador,
+      this.bomb,
+      this.bombKill,
       null,
       this
     );
@@ -123,7 +138,7 @@ export default class Juego extends Phaser.Scene {
     });
 
     //timer appears
-    this.timer = 60;
+    this.timer = 120;
     this.timerText = this.add.text(750, 5, this.timer, {
       fontSize: "32px",
       fontFamily: "impact",
@@ -148,6 +163,8 @@ export default class Juego extends Phaser.Scene {
       console.log("colision");
     });
 
+     //add bomb bounce
+     this.bomb.setVelocity(200, 200);
     
   }
 
@@ -155,6 +172,12 @@ export default class Juego extends Phaser.Scene {
     // update game objects
     // check input
     //move left
+
+    if (this.gameOver) {
+      console.log("you losee");
+      this.scene.restart();
+    }
+
     if (this.cursors.left.isDown) {
       this.jugador.setVelocityX(-160);
       this.jugador.anims.play("left", true);
@@ -181,6 +204,9 @@ export default class Juego extends Phaser.Scene {
 
     // todo / para hacer: sumar puntaje
     //this.cantidadEstrellas = this.cantidadEstrellas + 1;
+    if(this.estrellas.getTotalUsed() === 0){
+      this.salida.visible = true
+    }
     this.cantidadEstrellas++;
 
     this.cantidadEstrellasTexto.setText(
@@ -198,6 +224,11 @@ export default class Juego extends Phaser.Scene {
       this.gameOver = true;
     }
   }
+
+  bombKill(jugador, bomb) {
+    this.scene.restart();
+  }
+
 
   esVencedor(jugador, salida) {
     // if (this.cantidadEstrellas >= 5)

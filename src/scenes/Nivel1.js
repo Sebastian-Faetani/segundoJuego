@@ -63,6 +63,10 @@ export default class Juego extends Phaser.Scene {
 
     // Create empty group of starts
     this.estrellas = this.physics.add.group();
+    this.bomb = this.physics.add.group({
+      immovable: true,
+      allowGravity: false
+    });
 
     // find object layer
     // if type is "stars", add to stars group
@@ -77,8 +81,14 @@ export default class Juego extends Phaser.Scene {
           const star = this.estrellas.create(x, y, "star");
           break;
         }
+        case "bomb": {
+          const bomb = this.bomb.create(x, y, "bomb").setBounce(1, 1);
+          break;
+        }
       }
     });
+
+    this.salida.visible = false;
 
     this.physics.add.collider(this.jugador, plataformaLayer);
     this.physics.add.collider(this.estrellas, plataformaLayer);
@@ -86,6 +96,14 @@ export default class Juego extends Phaser.Scene {
       this.jugador,
       this.estrellas,
       this.recolectarEstrella,
+      null,
+      this
+    );
+    this.physics.add.collider(this.bomb, plataformaLayer)
+    this.physics.add.collider(
+      this.jugador,
+      this.bomb,
+      this.bombKill,
       null,
       this
     );
@@ -124,6 +142,12 @@ export default class Juego extends Phaser.Scene {
       fontFamily: "impact",
       fill: "#FFFFFF",
     });
+
+    //add bomb bounce
+    this.bomb.setVelocity(200, 200);
+    
+    
+
   }
 
   update() {
@@ -161,6 +185,11 @@ export default class Juego extends Phaser.Scene {
 
     // todo / para hacer: sumar puntaje
     //this.cantidadEstrellas = this.cantidadEstrellas + 1;
+
+    if(this.estrellas.getTotalUsed() === 0){
+      this.salida.visible = true
+    }
+
     this.cantidadEstrellas++;
 
     this.cantidadEstrellasTexto.setText(
@@ -179,6 +208,10 @@ export default class Juego extends Phaser.Scene {
     }
   }
 
+  bombKill(jugador, bomb) {
+    this.scene.restart();
+  }
+
   esVencedor(jugador, salida) {
     // if (this.cantidadEstrellas >= 5)
     // sacamos la condicion porque esta puesta como 4to parametro en el overlap
@@ -189,4 +222,6 @@ export default class Juego extends Phaser.Scene {
       cantidadEstrellas: this.cantidadEstrellas,
     });
   }
+
+ 
 }
