@@ -24,6 +24,12 @@ export default class Precarga extends Phaser.Scene {
     this.load.image("bomb", "./public/images/bomb.png");
     this.load.image("xEnemy", "./public/images/xEnemy.png");
     this.load.image("yEnemy", "./public/images/yEnemy.png");
+    this.load.audio("menuMusic", "./public/images/menuMusic.mp3");
+    this.load.audio("menuSecretMusic", "./public/images/menuSecretMusic.mp3");
+    this.load.audio("musicLevel1", "./public/images/musicLevel1.mp3");
+    this.load.audio("musicLevel2", "./public/images/musicLevel2.mp3");
+    this.load.audio("musicLevel3", "./public/images/musicLevel3.mp3");
+    this.load.audio("winSound", "./public/images/winSound.mp3");
 
     this.load.spritesheet("dude", "./public/images/dude.png", {
       frameWidth: 32,

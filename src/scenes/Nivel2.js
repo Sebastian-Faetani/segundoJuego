@@ -164,7 +164,11 @@ export default class Juego extends Phaser.Scene {
     });
 
      //add bomb bounce
-     this.bomb.setVelocity(200, 200);
+    this.bomb.setVelocity(200, 200);
+
+     //add music
+    this.backGroundMusic = this.sound.add("musicLevel2", { loop: true , volume: 0.15 });
+    this.backGroundMusic.play();
     
   }
 
@@ -175,6 +179,7 @@ export default class Juego extends Phaser.Scene {
 
     if (this.gameOver) {
       console.log("you losee");
+      this.backGroundMusic.stop();
       this.scene.restart();
     }
 
@@ -226,6 +231,7 @@ export default class Juego extends Phaser.Scene {
   }
 
   bombKill(jugador, bomb) {
+    this.backGroundMusic.stop();
     this.scene.restart();
   }
 
@@ -235,6 +241,7 @@ export default class Juego extends Phaser.Scene {
     // sacamos la condicion porque esta puesta como 4to parametro en el overlap
 
     console.log("estrellas recolectadas", this.cantidadEstrellas);
+    this.backGroundMusic.stop();
 
     this.scene.start("nivel3", {
       cantidadEstrellas: this.cantidadEstrellas,

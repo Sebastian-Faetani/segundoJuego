@@ -6,6 +6,8 @@ export default class StartMenu extends Phaser.Scene {
   create() {
     this.add.image(400, 300, "menuBackGround").setScale(0.555);
     this.add.image(400, 150, "menuTitle");
+    let menuMusic = this.sound.add("menuMusic", { loop: true , volume: 0.15});
+    menuMusic.play();
     let startButton = this.add.image(400, 300, "startButton").setInteractive();
 
     startButton.on("pointerdown", () => {
@@ -13,7 +15,8 @@ export default class StartMenu extends Phaser.Scene {
     });
 
     startButton.on("pointerup", () => {
-      this.scene.start("nivel1");
+      menuMusic.stop();
+      this.scene.start("nivel3");
     });
 
     startButton.on("pointerout", () => {

@@ -170,7 +170,7 @@ export default class Juego extends Phaser.Scene {
     });
 
     //timer appears
-    this.timer = 120;
+    this.timer = 180;
     this.timerText = this.add.text(750, 5, this.timer, {
       fontSize: "32px",
       fontFamily: "impact",
@@ -204,6 +204,9 @@ export default class Juego extends Phaser.Scene {
     //Make moving Y enemy
     this.yEnemy.setVelocityY(300);
 
+    //add music
+    this.backGroundMusic = this.sound.add("musicLevel3", { loop: true , volume: 0.15 });
+    this.backGroundMusic.play();
 
   }
 
@@ -214,6 +217,7 @@ export default class Juego extends Phaser.Scene {
 
     if (this.gameOver) {
       console.log("you losee");
+      this.backGroundMusic.stop();
       this.scene.restart();
     }
 
@@ -265,10 +269,12 @@ export default class Juego extends Phaser.Scene {
   }
 
   bombKill(jugador, bomb) {
+    this.backGroundMusic.stop();
     this.scene.restart();
   }
 
   enemyKill(jugador, xEnemy, yEnemy) {
+    this.backGroundMusic.stop();
     this.scene.restart();
   }
 
@@ -277,6 +283,7 @@ export default class Juego extends Phaser.Scene {
     // sacamos la condicion porque esta puesta como 4to parametro en el overlap
 
     console.log("estrellas recolectadas", this.cantidadEstrellas);
+    this.backGroundMusic.stop();
 
     this.scene.start("fin", {
       cantidadEstrellas: this.cantidadEstrellas,

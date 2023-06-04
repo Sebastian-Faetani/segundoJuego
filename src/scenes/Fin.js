@@ -17,20 +17,21 @@ export default class Fin extends Phaser.Scene {
   }
 
   create() {
+    let winSound = this.sound.add("winSound", { loop: false });
+    winSound.play();
+
     this.cantidadEstrellasTexto = this.add.text(
-      15,
-      15,
+      250,
+      30,
       "Estrellas recolectadas: " + this.cantidadEstrellas,
       { fontSize: "15px", fill: "#FFFFFF" }
-      
     );
-     this.add
+    this.add
       .image(400, 300, "win")
       .setScale(0.555)
       .setInteractive()
-      .on(
-        "pointerdown",
-        () => {this.scene.start("StartMenu")
-        });
+      .on("pointerdown", () => {
+        winSound.stop(), this.scene.start("StartMenu");
+      });
   }
 }
