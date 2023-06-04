@@ -4,23 +4,24 @@ export default class Juego extends Phaser.Scene {
   constructor() {
     // key of the scene
     // the key will be used to start the scene by other scenes
-    super("nivel1");
+    super("nivel3");
   }
 
-  init() {
+  init(data) {
     // this is called before the scene is created
     // init variables
     // take data passed from other scenes
     // data object param {}
-    this.nivel = 1;
-    this.cantidadEstrellas = 0;
-    console.log("Prueba !");
+
+    console.log(data);
+    this.nivel = 3;
+    this.cantidadEstrellas = data.cantidadEstrellas || 0;
     this.gameOver = false;
   }
 
   create() {
     // todo / para hacer: texto de puntaje
-    const map = this.make.tilemap({ key: "map1" });
+    const map = this.make.tilemap({ key: "map3" });
 
     // Parameters are the name you gave the tileset in Tiled and then the key of the tileset image in
     // Phaser's cache (i.e. the name you used in preload)
@@ -65,7 +66,15 @@ export default class Juego extends Phaser.Scene {
     this.estrellas = this.physics.add.group();
     this.bomb = this.physics.add.group({
       immovable: true,
-      allowGravity: false
+      allowGravity: false,
+    });
+    this.xEnemy = this.physics.add.group({
+      immovable: true,
+      allowGravity: false,
+    });
+    this.yEnemy = this.physics.add.group({
+      immovable: true,
+      allowGravity: false,
     });
 
     // find object layer
@@ -78,11 +87,20 @@ export default class Juego extends Phaser.Scene {
         case "estrella": {
           // add star to scene
           // console.log("estrella agregada: ", x, y);
+
           const star = this.estrellas.create(x, y, "star");
           break;
         }
         case "bomb": {
           const bomb = this.bomb.create(x, y, "bomb").setBounce(1, 1);
+          break;
+        }
+        case "xEnemy": {
+          const xEnemy = this.xEnemy.create(x, y, "xEnemy").setBounce(1, 1);
+          break;
+        }
+        case "yEnemy": {
+          const yEnemy = this.yEnemy.create(x, y, "yEnemy").setBounce(1, 1);
           break;
         }
       }
@@ -99,7 +117,7 @@ export default class Juego extends Phaser.Scene {
       null,
       this
     );
-    this.physics.add.collider(this.bomb, plataformaLayer)
+    this.physics.add.collider(this.bomb, plataformaLayer);
     this.physics.add.collider(
       this.jugador,
       this.bomb,
@@ -115,11 +133,27 @@ export default class Juego extends Phaser.Scene {
       () => this.cantidadEstrellas >= 1, // condicion de ejecucion
       this
     );
+    this.physics.add.collider(this.xEnemy, plataformaLayer);
+    this.physics.add.collider(
+      this.jugador,
+      this.xEnemy,
+      this.enemyKill,
+      null,
+      this
+    );
+    this.physics.add.collider(this.yEnemy, plataformaLayer);
+    this.physics.add.collider(
+      this.jugador,
+      this.yEnemy,
+      this.enemyKill,
+      null,
+      this
+    );
 
     /// mostrar cantidadEstrella en pantalla
     this.cantidadEstrellasTexto = this.add.text(
-      20,
-      5,
+      15,
+      15,
       "Nivel: " +
         this.nivel +
         " / Estrellas recolectadas: " +
@@ -136,17 +170,40 @@ export default class Juego extends Phaser.Scene {
     });
 
     //timer appears
-    this.timer = 60;
+    this.timer = 120;
     this.timerText = this.add.text(750, 5, this.timer, {
       fontSize: "32px",
       fontFamily: "impact",
       fill: "#FFFFFF",
     });
 
+    // add camara to follow player
+    this.cameras.main.startFollow(this.jugador);
+
+    // world bounds
+    this.physics.world.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
+    // camara dont go out of the map
+    this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels);
+
+    // fijar texto para que no se mueva con la camara
+    this.cantidadEstrellasTexto.setScrollFactor(0);
+    this.timerText.setScrollFactor(0);
+
+    // add collider to a non phisics group
+    this.physics.add.collider(this.estrellas, this.player, () => {
+      console.log("colision");
+    });
+
     //add bomb bounce
     this.bomb.setVelocity(200, 200);
-    
-    
+
+    //Make moving X enemy
+    this.xEnemy.setVelocityX(300);
+
+    //Make moving Y enemy
+    this.yEnemy.setVelocityY(300);
+
 
   }
 
@@ -154,6 +211,7 @@ export default class Juego extends Phaser.Scene {
     // update game objects
     // check input
     //move left
+
     if (this.gameOver) {
       console.log("you losee");
       this.scene.restart();
@@ -185,11 +243,9 @@ export default class Juego extends Phaser.Scene {
 
     // todo / para hacer: sumar puntaje
     //this.cantidadEstrellas = this.cantidadEstrellas + 1;
-
-    if(this.estrellas.getTotalUsed() === 0){
-      this.salida.visible = true
+    if (this.estrellas.getTotalUsed() === 0) {
+      this.salida.visible = true;
     }
-
     this.cantidadEstrellas++;
 
     this.cantidadEstrellasTexto.setText(
@@ -212,16 +268,20 @@ export default class Juego extends Phaser.Scene {
     this.scene.restart();
   }
 
+  enemyKill(jugador, xEnemy, yEnemy) {
+    this.scene.restart();
+  }
+
   esVencedor(jugador, salida) {
     // if (this.cantidadEstrellas >= 5)
     // sacamos la condicion porque esta puesta como 4to parametro en el overlap
 
     console.log("estrellas recolectadas", this.cantidadEstrellas);
 
-    this.scene.start("nivel2", {
+    this.scene.start("fin", {
       cantidadEstrellas: this.cantidadEstrellas,
+      y: "este es un dato de muestra",
+      z: "este es otro atributo enviado a otro escena",
     });
   }
-
- 
 }
