@@ -16,7 +16,7 @@ export default class StartMenu extends Phaser.Scene {
 
     startButton.on("pointerup", () => {
       menuMusic.stop();
-      this.scene.start("nivel3");
+      this.scene.start("nivel1");
     });
 
     startButton.on("pointerout", () => {
